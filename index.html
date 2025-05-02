@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemberHub - Membership Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MemberHub</h1>
+            <p>Efficient Membership Management and Certificate Generation</p>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <nav>
+                    <ul>
+                        <li class="active" data-tab="dashboard"><a href="#">Dashboard</a></li>
+                        <li data-tab="members"><a href="#">Members</a></li>
+                        <li data-tab="add-member"><a href="#">Add Member</a></li>
+                        <li data-tab="certificates"><a href="#">Certificates</a></li>
+                        <li data-tab="settings"><a href="#">Settings</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="content-area">
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content active">
+                    <h2>Dashboard</h2>
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <h3>Total Members</h3>
+                            <p id="total-members">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Active Members</h3>
+                            <p id="active-members">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Certificates Issued</h3>
+                            <p id="certificates-issued">0</p>
+                        </div>
+                    </div>
+                    <div class="recent-activity">
+                        <h3>Recent Activity</h3>
+                        <ul id="activity-list">
+                            <!-- Activity items will be added here -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Members Tab -->
+                <div id="members" class="tab-content">
+                    <h2>Member Management</h2>
+                    <div class="search-filter">
+                        <input type="text" id="member-search" placeholder="Search members...">
+                        <select id="member-filter">
+                            <option value="all">All Members</option>
+                            <option value="active">Active Only</option>
+                            <option value="inactive">Inactive Only</option>
+                        </select>
+                    </div>
+                    <table id="members-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Join Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Member rows will be added here -->
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        <button id="prev-page">Previous</button>
+                        <span id="page-info">Page 1 of 1</span>
+                        <button id="next-page">Next</button>
+                    </div>
+                </div>
+
+                <!-- Add Member Tab -->
+                <div id="add-member" class="tab-content">
+                    <h2>Add New Member</h2>
+                    <form id="add-member-form">
+                        <div class="form-group">
+                            <label for="member-name">Full Name</label>
+                            <input type="text" id="member-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="member-email">Email</label>
+                            <input type="email" id="member-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="member-phone">Phone</label>
+                            <input type="tel" id="member-phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="member-address">Address</label>
+                            <textarea id="member-address"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="member-dob">Date of Birth</label>
+                            <input type="date" id="member-dob">
+                        </div>
+                        <div class="form-group">
+                            <label for="member-status">Status</label>
+                            <select id="member-status">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="member-join-date">Join Date</label>
+                            <input type="date" id="member-join-date" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Add Member</button>
+                    </form>
+                </div>
+
+                <!-- Certificates Tab -->
+                <div id="certificates" class="tab-content">
+                    <h2>Certificate Generation</h2>
+                    <div class="certificate-controls">
+                        <div class="form-group">
+                            <label for="certificate-member">Select Member</label>
+                            <select id="certificate-member">
+                                <!-- Members will be populated here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="certificate-type">Certificate Type</label>
+                            <select id="certificate-type">
+                                <option value="membership">Membership Certificate</option>
+                                <option value="achievement">Achievement Certificate</option>
+                                <option value="completion">Completion Certificate</option>
+                                <option value="appreciation">Appreciation Certificate</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="certificate-date">Issue Date</label>
+                            <input type="date" id="certificate-date" required>
+                        </div>
+                        <button id="generate-certificate" class="btn-primary">Generate Certificate</button>
+                    </div>
+                    
+                    <div class="certificate-preview">
+                        <div id="certificate-template">
+                            <div class="certificate-border">
+                                <div class="certificate-header">
+                                    <h1>CERTIFICATE OF MEMBERSHIP</h1>
+                                </div>
+                                <div class="certificate-body">
+                                    <p>This is to certify that</p>
+                                    <h2 id="certificate-member-name">[Member Name]</h2>
+                                    <p>has been a valued member of our organization since</p>
+                                    <p id="certificate-join-date">[Join Date]</p>
+                                    <div class="signatures">
+                                        <div class="signature">
+                                            <p>_________________________</p>
+                                            <p>Organization President</p>
+                                        </div>
+                                        <div class="signature">
+                                            <p>_________________________</p>
+                                            <p>Date: <span id="certificate-issue-date">[Issue Date]</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="download-certificate" class="btn-secondary">Download Certificate</button>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settings" class="tab-content">
+                    <h2>Settings</h2>
+                    <form id="settings-form">
+                        <div class="form-group">
+                            <label for="org-name">Organization Name</label>
+                            <input type="text" id="org-name" value="Our Organization">
+                        </div>
+                        <div class="form-group">
+                            <label for="org-logo">Organization Logo URL</label>
+                            <input type="text" id="org-logo" placeholder="https://example.com/logo.png">
+                        </div>
+                        <div class="form-group">
+                            <label for="certificate-theme">Certificate Theme</label>
+                            <select id="certificate-theme">
+                                <option value="classic">Classic</option>
+                                <option value="modern">Modern</option>
+                                <option value="elegant">Elegant</option>
+                                <option value="minimal">Minimal</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="backup-data">Backup Data</label>
+                            <button type="button" id="backup-data" class="btn-secondary">Download Backup</button>
+                        </div>
+                        <div class="form-group">
+                            <label for="restore-data">Restore Data</label>
+                            <input type="file" id="restore-data" accept=".json">
+                        </div>
+                        <button type="submit" class="btn-primary">Save Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>MemberHub &copy; 2023 | Membership Management System</p>
+        </footer>
+    </div>
+
+    <!-- Member Edit Modal -->
+    <div id="member-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Edit Member</h2>
+            <form id="edit-member-form">
+                <input type="hidden" id="edit-member-id">
+                <div class="form-group">
+                    <label for="edit-member-name">Full Name</label>
+                    <input type="text" id="edit-member-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-member-email">Email</label>
+                    <input type="email" id="edit-member-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-member-status">Status</label>
+                    <select id="edit-member-status">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Save Changes</button>
+                <button type="button" id="delete-member" class="btn-danger">Delete Member</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
